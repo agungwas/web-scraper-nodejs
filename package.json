@@ -1,0 +1,15 @@
+{
+  "name": "onebrick",
+  "version": "1.0.0",
+  "description": "web scraping",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json2csv": "^5.0.7",
+    "puppeteer": "^14.3.0"
+  }
+}

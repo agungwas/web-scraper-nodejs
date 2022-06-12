@@ -2,9 +2,11 @@ const puppeteer = require('puppeteer');
 const fs = require('fs/promises');
 const { parseAsync } = require('json2csv');
 
+
 (async function() {
   let result = []
-  const browser = await puppeteer.launch({ headless: false })
+  const options = { headless: false, ignoreDefaultArgs: process.platform === 'win32' ? ['--disable-extensions'] : undefined }
+  const browser = await puppeteer.launch(options)
   const page = await browser.newPage()
 
   // await page.setViewport({
@@ -26,8 +28,10 @@ const { parseAsync } = require('json2csv');
   }, 1000);
 
   for (let pagiPage = 1; result.length < 100; pagiPage++) {
+    const navigate = page.waitForNavigation()
     await page.goto('https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=' + pagiPage)
-    
+    await navigate
+
     await page.evaluate(() => {
       return new Promise((resolve) => {
         const timer = setInterval(() => {
@@ -64,7 +68,7 @@ const { parseAsync } = require('json2csv');
 
   browser.close()
 
-  let detailBrowser = await puppeteer.launch({ headless: false })
+  let detailBrowser = await puppeteer.launch(options)
   const stringResult = []
 
   for (let a = 0; a < 100; a++) {
@@ -82,11 +86,13 @@ const { parseAsync } = require('json2csv');
     const el = result[a]
     if (a % 10 === 0) {
       detailBrowser.close()
-      detailBrowser = await puppeteer.launch({ headless: false })
+      detailBrowser = await puppeteer.launch(options)
     }
     
     const detailPage = await detailBrowser.newPage()
+    const navigate = detailPage.waitForNavigation()
     await detailPage.goto(el.link)
+    await navigate
 
     await detailPage.waitForSelector('#pdp_comp-product_media > div > div.css-1k04i9x > div > div', { timeout: 50000 })
     await detailPage.waitForSelector('#pdp_comp-product_content > div > div.css-7fidm1 > div > div:nth-child(3) > span:nth-child(1) > span.main', { timeout: 50000 })
